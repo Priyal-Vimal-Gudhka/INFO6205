@@ -1,9 +1,12 @@
 package edu.neu.coe.info6205.threesum;
 
+import edu.neu.coe.info6205.util.Stopwatch;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Implementation of ThreeSum which follows the approach of dividing the solution-space into
@@ -19,6 +22,19 @@ public class ThreeSumQuadraticWithCalipers implements ThreeSum {
      *
      * @param a a sorted array.
      */
+    public static void main(String args[]){
+
+        Supplier<int[]> intsSupplier = new Source(16000, 1000).intsSupplier(10);
+        int[] ints = intsSupplier.get();
+        ThreeSum calculateTarget = new ThreeSumQuadraticWithCalipers(ints);
+
+        Stopwatch start = new Stopwatch();
+        Triple[] triplesQuadratic = calculateTarget.getTriples();
+        long lap = start.lap();
+        System.out.println("Lap in miliseconds is: "+lap);
+        start.close();
+
+    }
     public ThreeSumQuadraticWithCalipers(int[] a) {
         this.a = a;
         length = a.length;
@@ -49,6 +65,26 @@ public class ThreeSumQuadraticWithCalipers implements ThreeSum {
     public static List<Triple> calipers(int[] a, int i, Function<Triple, Integer> function) {
         List<Triple> triples = new ArrayList<>();
         // FIXME : use function to qualify triples and to navigate otherwise.
+
+        int low = 0;
+        int high = a.length -1;
+
+        while ((low < i) && (high > i)) {
+
+            Triple triple = new Triple(a[low], a[high], a[i]);
+            if ( function.apply(triple) == 0) {
+
+                triples.add(triple);
+
+                low++;
+                high--;
+            } else if (function.apply(triple) < 0)
+                low++;
+
+            else
+                high--;
+
+        }
         // END 
         return triples;
     }

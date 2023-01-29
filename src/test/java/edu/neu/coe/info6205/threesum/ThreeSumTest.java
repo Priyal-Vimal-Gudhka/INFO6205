@@ -41,10 +41,8 @@ public class ThreeSumTest {
     public void testGetTriples0() {
         int[] ints = new int[]{30, -40, -20, -10, 40, 0, 10, 5};
         Arrays.sort(ints);
-        System.out.println("ints: " + Arrays.toString(ints));
         ThreeSum target = new ThreeSumQuadratic(ints);
         Triple[] triples = target.getTriples();
-        System.out.println("triples: " + Arrays.toString(triples));
         assertEquals(4, triples.length);
         assertEquals(4, new ThreeSumCubic(ints).getTriples().length);
     }
@@ -58,7 +56,6 @@ public class ThreeSumTest {
         assertEquals(4, triples.length);
         System.out.println(Arrays.toString(triples));
         Triple[] triples2 = new ThreeSumCubic(ints).getTriples();
-        System.out.println(Arrays.toString(triples2));
         assertEquals(4, triples2.length);
     }
 
@@ -67,9 +64,7 @@ public class ThreeSumTest {
         Supplier<int[]> intsSupplier = new Source(10, 15, 3L).intsSupplier(10);
         int[] ints = intsSupplier.get();
         ThreeSum target = new ThreeSumQuadratic(ints);
-        System.out.println(Arrays.toString(ints));
         Triple[] triples = target.getTriples();
-        System.out.println(Arrays.toString(triples));
         assertEquals(1, triples.length);
         assertEquals(1, new ThreeSumCubic(ints).getTriples().length);
     }
@@ -100,7 +95,6 @@ public class ThreeSumTest {
     public void testGetTriplesC0() {
         int[] ints = new int[]{30, -40, -20, -10, 40, 0, 10, 5};
         Arrays.sort(ints);
-        System.out.println("ints: " + Arrays.toString(ints));
         ThreeSum target = new ThreeSumQuadratic(ints);
         Triple[] triples = target.getTriples();
         System.out.println("triples: " + Arrays.toString(triples));
@@ -128,7 +122,6 @@ public class ThreeSumTest {
         ThreeSum target = new ThreeSumQuadraticWithCalipers(ints);
         System.out.println(Arrays.toString(ints));
         Triple[] triples = target.getTriples();
-        System.out.println(Arrays.toString(triples));
         assertEquals(1, triples.length);
         assertEquals(1, new ThreeSumCubic(ints).getTriples().length);
     }

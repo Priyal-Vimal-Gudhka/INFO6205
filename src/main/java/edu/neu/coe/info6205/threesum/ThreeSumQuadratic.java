@@ -1,8 +1,12 @@
 package edu.neu.coe.info6205.threesum;
 
+import edu.neu.coe.info6205.util.Stopwatch;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Implementation of ThreeSum which follows the approach of dividing the solution-space into
@@ -17,6 +21,20 @@ public class ThreeSumQuadratic implements ThreeSum {
      * Construct a ThreeSumQuadratic on a.
      * @param a a sorted array.
      */
+
+    public static void main(String args[]){
+
+        Supplier<int[]> intsSupplier = new Source(16000, 1000).intsSupplier(10);
+        int[] ints = intsSupplier.get();
+        ThreeSum calculateTarget = new ThreeSumQuadratic(ints);
+
+        Stopwatch start = new Stopwatch();
+        Triple[] triplesQuadratic = calculateTarget.getTriples();
+        long lap = start.lap();
+        System.out.println("Lap in miliseconds is: "+lap);
+        start.close();
+    }
+
     public ThreeSumQuadratic(int[] a) {
         this.a = a;
         length = a.length;
@@ -26,6 +44,7 @@ public class ThreeSumQuadratic implements ThreeSum {
         List<Triple> triples = new ArrayList<>();
         for (int i = 0; i < length; i++) triples.addAll(getTriples(i));
         Collections.sort(triples);
+        System.out.println(triples.stream().distinct().toArray(Triple[]::new));
         return triples.stream().distinct().toArray(Triple[]::new);
     }
 
@@ -37,11 +56,30 @@ public class ThreeSumQuadratic implements ThreeSum {
      */
     public List<Triple> getTriples(int j) {
         List<Triple> triples = new ArrayList<>();
-        // FIXME : for each candidate, test if a[i] + a[j] + a[k] = 0.
-        // END 
+
+        int low = 0;
+        int high = a.length -1;
+
+        while ((low < j) && (high > j)) {
+            if (a[low] + a[high] + a[j] == 0) {
+                Triple tr = new Triple(a[low], a[j], a[high]);
+
+                triples.add(tr);
+
+                low++;
+                high--;
+            } else if (a[low] + a[j] + a[high] < 0)
+                low++;
+
+            else
+                high--;
+
+        }
         return triples;
+
     }
 
     private final int[] a;
     private final int length;
 }
+
