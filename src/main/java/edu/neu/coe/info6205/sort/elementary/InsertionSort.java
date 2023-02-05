@@ -8,11 +8,8 @@ import edu.neu.coe.info6205.sort.Helper;
 import edu.neu.coe.info6205.sort.SortWithHelper;
 import edu.neu.coe.info6205.util.Config;
 
-/**
- * Class InsertionSort.
- *
- * @param <X> the underlying comparable type.
- */
+import java.util.Arrays;
+
 public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
 
     /**
@@ -50,7 +47,7 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
     }
 
     public InsertionSort() {
-        this(BaseHelper.getHelper(InsertionSort.class));
+        this(BaseHelper.getHelper(edu.neu.coe.info6205.sort.elementary.InsertionSort.class));
     }
 
     /**
@@ -63,13 +60,24 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
 
-        // FIXME
-        // END 
+        //Used outer loop for sorting the elements from the first element
+        for (int start = from+1; start < to; start++) {
+
+            //Used inner loop to keep track of the upper element
+            for(int j = start-1; j >= from; j--){
+
+                //Calling swapStableConditional method of the helper class to check if the next element is greater than the previous
+
+                if(!helper.swapStableConditional(xs, j+1))
+                    break;
+            }
+        }
+        // END
     }
 
     public static final String DESCRIPTION = "Insertion sort";
 
     public static <T extends Comparable<T>> void sort(T[] ts) {
-        new InsertionSort<T>().mutatingSort(ts);
+        new edu.neu.coe.info6205.sort.elementary.InsertionSort<T>().mutatingSort(ts);
     }
 }

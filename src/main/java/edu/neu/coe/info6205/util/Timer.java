@@ -5,20 +5,20 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-/**
- * Class which is able to time the running of functions.
- */
 public class Timer {
 
     /**
-     * Run the given function n times, once per "lap" and then return the result of calling meanLapTime().
-     * The clock will be running when the method is invoked and when it is quit.
-     *
-     * This is the simplest form of repeat.
+     * Construct a new Timer and set it running.
+     */
+    public Timer() {
+        resume();
+    }
+
+    /**
+     * Run the given function n times, once per "lap" and then return the result of calling stop().
      *
      * @param n        the number of repetitions.
-     * @param function a function which yields a T.
-     * @param <T> the type supplied by function (amy be Void).
+     * @param function a function which yields a T (T may be Void).
      * @return the average milliseconds per repetition.
      */
     public <T> double repeat(int n, Supplier<T> function) {
@@ -33,13 +33,11 @@ public class Timer {
     }
 
     /**
-     * Run the given functions n times, once per "lap" and then return the mean lap time.
+     * Run the given functions n times, once per "lap" and then return the result of calling stop().
      *
      * @param n        the number of repetitions.
      * @param supplier a function which supplies a different T value for each repetition.
-     * @param function a function T=>U and which is to be timed.
-     * @param <T> the type which is supplied by supplier and passed in to function.
-     * @param <U> the type which is the result of <code>function</code> (may be Void).
+     * @param function a function T=>U and which is to be timed (U may be Void).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function) {
@@ -52,24 +50,54 @@ public class Timer {
      * @param n            the number of repetitions.
      * @param supplier     a function which supplies a T value.
      * @param function     a function T=>U and which is to be timed.
-     * @param preFunction  a function which pre-processes a T value and which precedes the call of function, but which is not timed (may be null). The result of the preFunction, if any, is also a T.
+     * @param preFunction  a function which pre-processes a T value and which precedes the call of function, but which is not timed (may be null).
      * @param postFunction a function which consumes a U and which succeeds the call of function, but which is not timed (may be null).
-     * @param <T> the type which is supplied by supplier, processed by prefunction (if any), and passed in to function.
-     * @param <U> the type which is the result of function and the input to postFunction (if any).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
         logger.trace("repeat: with " + n + " runs");
-        // FIXME: note that the timer is running when this method is called and should still be running when it returns. by replacing the following code
-         return 0;
-        // END 
+
+        for (int number = 0; number < n; number++) {
+
+            //Using supplier function to get the values of t
+            T valueOfT = supplier.get();
+
+            //Used if loop to check if precondition is not null, then will reassign the value of T
+            if (preFunction != null) {
+                pause();
+                T newValueOfT = preFunction.apply(valueOfT);
+
+                valueOfT = newValueOfT;
+
+                resume();
+            }
+
+            //Used for getting the value of u
+            U u = function.apply(valueOfT);
+
+            //Used if loop to check if postcondition is not null
+            if (postFunction != null) {
+                pause();
+                postFunction.accept(u);
+                resume();
+            }
+
+            //Called lap function to increment the value of lap
+            lap();
+        }
+
+        pause();
+        double result = meanLapTime(); //Calculates the mean lap time in milliseconds
+        resume();
+        return result;
+        // END
     }
 
     /**
      * Stop this Timer and return the mean lap time in milliseconds.
      *
      * @return the average milliseconds used by each lap.
-     * @throws TimerException if this Timer is not running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is not running.
      */
     public double stop() {
         pauseAndLap();
@@ -80,10 +108,10 @@ public class Timer {
      * Return the mean lap time in milliseconds for this paused timer.
      *
      * @return the average milliseconds used by each lap.
-     * @throws TimerException if this Timer is running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is running.
      */
     public double meanLapTime() {
-        if (running) throw new TimerException();
+        if (running) throw new edu.neu.coe.info6205.util.Timer.TimerException();
         return toMillisecs(ticks) / laps;
     }
 
@@ -91,7 +119,7 @@ public class Timer {
      * Pause this timer at the end of a "lap" (repetition).
      * The lap counter will be incremented by one.
      *
-     * @throws TimerException if this Timer is not running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is not running.
      */
     public void pauseAndLap() {
         lap();
@@ -102,10 +130,10 @@ public class Timer {
     /**
      * Resume this timer to begin a new "lap" (repetition).
      *
-     * @throws TimerException if this Timer is already running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is already running.
      */
     public void resume() {
-        if (running) throw new TimerException();
+        if (running) throw new edu.neu.coe.info6205.util.Timer.TimerException();
         ticks -= getClock();
         running = true;
     }
@@ -114,10 +142,10 @@ public class Timer {
      * Increment the lap counter without pausing.
      * This is the equivalent of calling pause and resume.
      *
-     * @throws TimerException if this Timer is not running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is not running.
      */
     public void lap() {
-        if (!running) throw new TimerException();
+        if (!running) throw new edu.neu.coe.info6205.util.Timer.TimerException();
         laps++;
     }
 
@@ -125,7 +153,7 @@ public class Timer {
      * Pause this timer during a "lap" (repetition).
      * The lap counter will remain the same.
      *
-     * @throws TimerException if this Timer is not running.
+     * @throws edu.neu.coe.info6205.util.Timer.TimerException if this Timer is not running.
      */
     public void pause() {
         pauseAndLap();
@@ -139,7 +167,7 @@ public class Timer {
      * @return the total number of milliseconds elapsed for this timer.
      */
     public double millisecs() {
-        if (running) throw new TimerException();
+        if (running) throw new edu.neu.coe.info6205.util.Timer.TimerException();
         return toMillisecs(ticks);
     }
 
@@ -150,13 +178,6 @@ public class Timer {
                 ", laps=" + laps +
                 ", running=" + running +
                 '}';
-    }
-
-    /**
-     * Construct a new Timer and set it running.
-     */
-    public Timer() {
-        resume();
     }
 
     private long ticks = 0L;
@@ -187,9 +208,8 @@ public class Timer {
      * @return the number of ticks for the system clock. Currently defined as nano time.
      */
     private static long getClock() {
-        // FIXME by replacing the following code
-         return 0;
-        // END 
+        return System.nanoTime();
+        // END
     }
 
     /**
@@ -200,12 +220,13 @@ public class Timer {
      * @return the corresponding number of milliseconds.
      */
     private static double toMillisecs(long ticks) {
-        // FIXME by replacing the following code
-         return 0;
-        // END 
+
+        double timeInms = ticks / 1000000;
+        return timeInms;
+        // END
     }
 
-    final static LazyLogger logger = new LazyLogger(Timer.class);
+    final static LazyLogger logger = new LazyLogger(edu.neu.coe.info6205.util.Timer.class);
 
     static class TimerException extends RuntimeException {
         public TimerException() {
