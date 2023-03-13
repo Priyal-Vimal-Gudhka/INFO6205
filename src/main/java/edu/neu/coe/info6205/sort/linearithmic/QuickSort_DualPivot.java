@@ -1,6 +1,9 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
 import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.InstrumentedHelper;
+import edu.neu.coe.info6205.util.Benchmark;
+import edu.neu.coe.info6205.util.Benchmark_Timer;
 import edu.neu.coe.info6205.util.Config;
 
 import java.util.ArrayList;
@@ -104,6 +107,42 @@ public class QuickSort_DualPivot<X extends Comparable<X>> extends QuickSort<X> {
         }
 
         private final Helper<X> helper;
+    }
+
+    public static void main (String[] args) {
+        int numberOfElements = 60000;
+
+        InstrumentedHelper<Integer> helper = new InstrumentedHelper<>("QuickSort_DualPivot", Config.setupConfig("false", "0", "0", "", ""));
+
+        QuickSort_DualPivot<Integer> quicksortDualPivot = new QuickSort_DualPivot<>(helper);
+        quicksortDualPivot.init(numberOfElements);
+
+        Integer[] xs = helper.random(Integer.class, r -> r.nextInt(200000));
+
+        Partitioner<Integer> partitioner = quicksortDualPivot.createPartitioner();
+        List<Partition<Integer>> partitions = partitioner.partition(new Partition<>(xs, 0, xs.length));
+
+        Partition<Integer> partition1 = partitions.get(0);
+        Partition<Integer> partition2 = partitions.get(1);
+        Partition<Integer> partition3 = partitions.get(2);
+
+        Benchmark<Boolean> benchmark1 = new Benchmark_Timer<>("Randomly generated array", b -> quicksortDualPivot.sort(xs, 0, partition1.to, 0));
+        double timeForPartition1 = benchmark1.run(true, 20);
+        Benchmark<Boolean> benchmark2 = new Benchmark_Timer<>("Randomly generated array", b -> quicksortDualPivot.sort(xs, partition2.from, partition2.to, 0));
+        double timeForPartition2 = benchmark2.run(true, 20);
+        Benchmark<Boolean> benchmark3 = new Benchmark_Timer<>("Randomly generated array", b -> quicksortDualPivot.sort(xs, partition3.from, numberOfElements, 0));
+        double timeForPartition3 = benchmark3.run(true, 20);
+
+        double timeTakenToSortArray = timeForPartition1 + timeForPartition2 + timeForPartition3;
+        long numberOfCompares = helper.getCompares();
+        long numberOfSwaps = helper.getSwaps();
+        long numberOfHits = helper.getHits();
+
+        System.out.println("Number of elements to sort using QuickSort DualPivot is : "+numberOfElements);
+        System.out.println("Time taken to sort array using QuickSort DualPivot in ns is : "+timeTakenToSortArray);
+        System.out.println("Number of compares : "+numberOfCompares);
+        System.out.println("Number of swaps : "+numberOfSwaps);
+        System.out.println("Number of hits : "+numberOfHits);
     }
 }
 

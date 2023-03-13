@@ -1,8 +1,11 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
 import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.InstrumentedHelper;
 import edu.neu.coe.info6205.sort.SortWithHelper;
 import edu.neu.coe.info6205.sort.elementary.InsertionSort;
+import edu.neu.coe.info6205.util.Benchmark;
+import edu.neu.coe.info6205.util.Benchmark_Timer;
 import edu.neu.coe.info6205.util.Config;
 
 import java.util.Arrays;
@@ -55,6 +58,18 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
     }
 
     private void sort(X[] a, X[] aux, int from, int to) {
+//        final Helper<X> helper = getHelper();
+//        Config config = helper.getConfig();
+//        boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
+//        boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
+//        if (to <= from + helper.cutoff()) {
+//            insertionSort.sort(a, from, to);
+//            return;
+//        }
+
+        // FIXME : implement merge sort with insurance and no-copy optimizations
+        // END
+
         final Helper<X> helper = getHelper();
         Config config = helper.getConfig();
         boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
@@ -63,9 +78,31 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
             insertionSort.sort(a, from, to);
             return;
         }
+//        int mid = from + (to - from) / 2;
+//        if (noCopy) {
+//            sort(aux, a, from, mid);
+//            sort(aux, a, mid, to);
+//            if (insurance && helper.less(aux, mid - 1, mid)) {
+//                helper.copyBlock(aux, from, a, from, to - from);
+////                helper.incrementCopies(to - from);
+//            } else
+//                merge(aux, a, from, mid, to);
+//        } else {
+//            sort(a, aux, from, mid);
+//            sort(a, aux, mid, to);
+//            helper.copyBlock(a, from, aux, from, to - from);
+//            if (insurance && helper.less(a[mid - 1], a[mid])) return;
+//            merge(aux, a, from, mid, to);
+//        }
+        else {
+            int mid = from+(to-from)/2;
+            sort(a, aux, from, mid);
+            sort(a, aux, mid, to);
+            merge(a, aux, from, mid, to);
+        }
 
         // FIXME : implement merge sort with insurance and no-copy optimizations
-        // END 
+        // END
     }
 
     // CONSIDER combine with MergeSortBasic perhaps.
@@ -91,6 +128,28 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
         if (config.getBoolean(MERGESORT, INSURANCE)) stringBuilder.append(" with insurance comparison");
         if (config.getBoolean(MERGESORT, NOCOPY)) stringBuilder.append(" with no copy");
         return stringBuilder.toString();
+    }
+
+    public static void main (String[] args) {
+        int numberOfElements = 320000;
+        InstrumentedHelper<Integer> helper = new InstrumentedHelper<>("MergeSort", Config.setupConfig("false", "0", "0", "", ""));
+
+        MergeSort<Integer> mergeSort = new MergeSort<>(helper);
+        mergeSort.init(numberOfElements);
+        Integer[] xs = helper.random(Integer.class, r -> r.nextInt(200000));
+        Benchmark<Boolean> benchmark = new Benchmark_Timer<>("Randomly generated array", b -> mergeSort.sort(xs, 0, numberOfElements));
+        double timeTakenToSort = benchmark.run(true, 20);
+
+        long numberOfCompares = helper.getCompares();
+        long numberOfSwaps = helper.getSwaps();
+        long numberOfHits = helper.getHits();
+
+        System.out.println("Number of elements to sort using MergeSort is : "+numberOfElements);
+        System.out.println("Time taken to sort array using MergeSort in ns is : "+timeTakenToSort);
+        System.out.println("Number of compares : "+numberOfCompares);
+        System.out.println("Number of swaps : "+numberOfSwaps);
+        System.out.println("Number of hits : "+numberOfHits);
+
     }
 
     private final InsertionSort<X> insertionSort;
