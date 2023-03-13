@@ -57,18 +57,7 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
         sort(a, aux, from, to);
     }
 
-    private void sort(X[] a, X[] aux, int from, int to) {
-//        final Helper<X> helper = getHelper();
-//        Config config = helper.getConfig();
-//        boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
-//        boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
-//        if (to <= from + helper.cutoff()) {
-//            insertionSort.sort(a, from, to);
-//            return;
-//        }
-
-        // FIXME : implement merge sort with insurance and no-copy optimizations
-        // END
+    private void sort(X[] a, X[] aux, int from, int to) 
 
         final Helper<X> helper = getHelper();
         Config config = helper.getConfig();
@@ -78,22 +67,7 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
             insertionSort.sort(a, from, to);
             return;
         }
-//        int mid = from + (to - from) / 2;
-//        if (noCopy) {
-//            sort(aux, a, from, mid);
-//            sort(aux, a, mid, to);
-//            if (insurance && helper.less(aux, mid - 1, mid)) {
-//                helper.copyBlock(aux, from, a, from, to - from);
-////                helper.incrementCopies(to - from);
-//            } else
-//                merge(aux, a, from, mid, to);
-//        } else {
-//            sort(a, aux, from, mid);
-//            sort(a, aux, mid, to);
-//            helper.copyBlock(a, from, aux, from, to - from);
-//            if (insurance && helper.less(a[mid - 1], a[mid])) return;
-//            merge(aux, a, from, mid, to);
-//        }
+
         else {
             int mid = from+(to-from)/2;
             sort(a, aux, from, mid);
@@ -101,8 +75,6 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
             merge(a, aux, from, mid, to);
         }
 
-        // FIXME : implement merge sort with insurance and no-copy optimizations
-        // END
     }
 
     // CONSIDER combine with MergeSortBasic perhaps.
